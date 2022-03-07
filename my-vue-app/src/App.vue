@@ -37,15 +37,15 @@ onMounted(()=>{
 
 
 
-//window.setInterval( function(){
-//  if(Cesium.Math.toRadians(-75)<viewer.camera.pitch&&viewer.camera.pitch<Cesium.Math.toRadians(-35)){
-//       console.log("好视角")
-//    }
-//    else{
-//       console.log("差视角")
-//    }
-//
-//}, 3000);
+    window.setInterval( function(){
+      if(Cesium.Math.toRadians(-75)<viewer.camera.pitch&&viewer.camera.pitch<Cesium.Math.toRadians(-35)){
+           console.log("好视角")
+        }
+        else{
+           console.log("差视角")
+        }
+    
+    }, 6000);
 
    
 
@@ -106,7 +106,7 @@ onMounted(()=>{
     }
 
 
-
+  //跳转到初始视角
   function BackToOrgin(){
         viewer.camera.flyTo({
           destination:Cesium.Cartesian3.fromDegrees(113.318977,23.114155,1800),
