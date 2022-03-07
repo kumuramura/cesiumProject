@@ -1,6 +1,6 @@
 <template>
  <div id="cesiumContainer"> </div>
- <button v-on:click="jumpToOrgin">回到初始视角</button>
+ <button v-on:click="BackToOrgin">回到初始视角</button>
 </template>
 
 <script setup>
@@ -74,8 +74,6 @@ onMounted(()=>{
          id:'模型1',
          url : '../src/3Dmodel/city2-draco.gltf',
          modelMatrix : modelMatrix,
-         //minimumPixelSize : 600,
-         //maximumScale : 20000,
          scale : 100,  //放大倍数
          incrementallyLoadTextures:true,
          })
@@ -107,17 +105,9 @@ onMounted(()=>{
         }
     }
 
-    
-    
-   
-   
-
-   
-
- 
 
 
-  function jumpToOrgin(){
+  function BackToOrgin(){
         viewer.camera.flyTo({
           destination:Cesium.Cartesian3.fromDegrees(113.318977,23.114155,1800),
           orientation:{//方向、俯视和仰角
