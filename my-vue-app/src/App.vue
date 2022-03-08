@@ -41,11 +41,26 @@ onMounted(()=>{
       if(Cesium.Math.toRadians(-75)<viewer.camera.pitch&&viewer.camera.pitch<Cesium.Math.toRadians(-35)){
            console.log("好视角")
         }
-        else{
+        else if(Cesium.Math.toRadians(-75)>viewer.camera.pitch){
            console.log("差视角")
+           viewer.camera.flyTo({
+              orientation:{//方向、俯视和仰角
+              heading:Cesium.Math.toRadians(0),
+              pitch:Cesium.Math.toRadians(-75),
+            }
+         });
+        }
+        else if(viewer.camera.pitch>Cesium.Math.toRadians(-35)){
+            console.log("差视角")
+            viewer.camera.flyTo({
+              orientation:{//方向、俯视和仰角
+              heading:Cesium.Math.toRadians(0),
+              pitch:Cesium.Math.toRadians(-35),
+            }
+         });
         }
     
-    }, 6000);
+    }, 100);
 
    
 
