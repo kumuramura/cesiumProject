@@ -11,7 +11,7 @@ onMounted(()=>{
   url:'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
 
   });
-  const viewer= new Cesium.Viewer('cesiumContainer',{
+  const viewer= new Cesium.Viewer('cesiumContainer',{//viewer初始化设置
     baseLayerPicker:false,
     imageryProvider:custom,
     timeline:false,
@@ -35,36 +35,51 @@ onMounted(()=>{
   scene.screenSpaceCameraController.enableCollisionDetection = false;// 是否允许相机进入地下
   scene.mode = Cesium.SceneMode.COLUMBUS_VIEW;//默认2.5D
 
+  
 
 
+   //每秒检测一下视角对不对，此处问题非常多，建议锁定上下视角
     window.setInterval( function(){
       var lon=viewer.camera.positionCartographic.longitude* 180 / Math.PI;
       var lan=viewer.camera.positionCartographic.latitude* 180 / Math.PI;
-      if(Cesium.Math.toRadians(-90)<viewer.camera.pitch&&viewer.camera.pitch<Cesium.Math.toRadians(-35)){
-           console.log("好视角")
+      if(Cesium.Math.toRadians(-90)<viewer.camera.pitch&&viewer.camera.pitch<Cesium.Math.toRadians(0)){
+           //console.log("好视角")
         }
         else if(Cesium.Math.toRadians(-90)>viewer.camera.pitch){
-           console.log("差视角")
+           //console.log("差视角")
            viewer.camera.setView({
-              destination:Cesium.Cartesian3.fromDegrees(lon,lan,1800),
+              destination:Cesium.Cartesian3.fromDegrees(lon,lan,100),
               orientation:{//方向、俯视和仰角
               heading:Cesium.Math.toRadians(0),
               pitch:Cesium.Math.toRadians(-89),
             }
          });
         }
-        else if(viewer.camera.pitch>Cesium.Math.toRadians(-35)){
-            console.log("差视角");
+        else if(viewer.camera.pitch>Cesium.Math.toRadians(0)){
+            //console.log("差视角");
             viewer.camera.setView({
-              destination:Cesium.Cartesian3.fromDegrees(lon,lan,1800),
+              destination:Cesium.Cartesian3.fromDegrees(lon,lan,100),
               orientation:{//方向、俯视和仰角
               heading:Cesium.Math.toRadians(0),
-              pitch:Cesium.Math.toRadians(-36),
+              pitch:Cesium.Math.toRadians(-1),
             }
          });
         }
+
+        console.log(viewer.camera.position.y);
     
-    }, 2000);
+    }, 1000);
+
+
+
+    //设置初始化视角
+   viewer.camera.setView({
+     destination:Cesium.Cartesian3.fromDegrees(113.318977,23.104155,1800),
+     orientation:{//方向、俯视和仰角
+       heading:Cesium.Math.toRadians(0),
+       pitch:Cesium.Math.toRadians(-45),
+     }
+ })
 
    
 
@@ -77,15 +92,10 @@ onMounted(()=>{
   scene.screenSpaceCameraController.zoomEventTypes = [
      Cesium.CameraEventType.MIDDLE_DRAG, Cesium.CameraEventType.WHEEL, Cesium.CameraEventType.PINCH];
 
+  
 
-   viewer.camera.setView({
-     destination:Cesium.Cartesian3.fromDegrees(113.318977,23.114155,1800),
-     orientation:{//方向、俯视和仰角
-       heading:Cesium.Math.toRadians(0),
-       pitch:Cesium.Math.toRadians(-45),
-     }
- })
 
+   //导入模型
     var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
          Cesium.Cartesian3.fromDegrees(113.318977,23.114155));
     
@@ -98,8 +108,11 @@ onMounted(()=>{
          })
     );
     
+    //缩放模型，作用不大
     const scale=Cesium.Matrix4.fromScale(new Cesium.Cartesian3(0.5,0.5,0.5),new Cesium.Matrix4)
     model.modelMatrix=Cesium.Matrix4.multiply(model.modelMatrix,scale,model.modelMatrix)
+
+    //点击检测
     var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
      handler.setInputAction(function (click) {
          var pick = viewer.scene.pick(click.position);
@@ -115,7 +128,7 @@ onMounted(()=>{
          }
      }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
     
-
+    //不用
     function mode3D_play(checkbox){
         if(checkbox.checked==true){
             model.show=true;
@@ -125,14 +138,15 @@ onMounted(()=>{
     }
 
 
-  //跳转到初始视角
+  //跳转到初始视角，与setView的区别在于有飞行的过程
   function BackToOrgin(){
         viewer.camera.flyTo({
           destination:Cesium.Cartesian3.fromDegrees(113.318977,23.114155,1800),
           orientation:{//方向、俯视和仰角
             heading:Cesium.Math.toRadians(0),
             pitch:Cesium.Math.toRadians(-45),
-            }
+            },
+          duration:5,
          });
       }
  }
