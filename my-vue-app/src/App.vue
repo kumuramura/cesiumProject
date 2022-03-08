@@ -38,31 +38,33 @@ onMounted(()=>{
 
 
     window.setInterval( function(){
-      if(Cesium.Math.toRadians(-75)<viewer.camera.pitch&&viewer.camera.pitch<Cesium.Math.toRadians(-35)){
+      var lon=viewer.camera.positionCartographic.longitude* 180 / Math.PI;
+      var lan=viewer.camera.positionCartographic.latitude* 180 / Math.PI;
+      if(Cesium.Math.toRadians(-90)<viewer.camera.pitch&&viewer.camera.pitch<Cesium.Math.toRadians(-35)){
            console.log("好视角")
         }
-        else if(Cesium.Math.toRadians(-75)>viewer.camera.pitch){
+        else if(Cesium.Math.toRadians(-90)>viewer.camera.pitch){
            console.log("差视角")
            viewer.camera.setView({
-              destination:viewer.camera.positionWC,
+              destination:Cesium.Cartesian3.fromDegrees(lon,lan,1800),
               orientation:{//方向、俯视和仰角
               heading:Cesium.Math.toRadians(0),
-              pitch:Cesium.Math.toRadians(-75),
+              pitch:Cesium.Math.toRadians(-89),
             }
          });
         }
         else if(viewer.camera.pitch>Cesium.Math.toRadians(-35)){
             console.log("差视角");
             viewer.camera.setView({
-              destination:viewer.camera.positionWC,
+              destination:Cesium.Cartesian3.fromDegrees(lon,lan,1800),
               orientation:{//方向、俯视和仰角
               heading:Cesium.Math.toRadians(0),
-              pitch:Cesium.Math.toRadians(-35),
+              pitch:Cesium.Math.toRadians(-36),
             }
          });
         }
     
-    }, 100);
+    }, 2000);
 
    
 
