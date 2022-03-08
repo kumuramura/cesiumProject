@@ -28,7 +28,7 @@ onMounted(()=>{
 
   });
   var scene=viewer.scene;
-  //viewer.scene.screenSpaceCameraController.enableZoom =false;
+  viewer.scene.screenSpaceCameraController.enableZoom =false;
   viewer.cesiumWidget.creditContainer.style.display = "none";//移除版权信息
   scene.skyAtmosphere.show=false;    // 关闭大气层
   scene.debugShowFramesPerSecond = true;//显示帧数
@@ -44,6 +44,7 @@ onMounted(()=>{
         else if(Cesium.Math.toRadians(-75)>viewer.camera.pitch){
            console.log("差视角")
            viewer.camera.flyTo({
+             destination:Cesium.Cartesian3.fromDegrees(113.318977,23.114155,1800),
               orientation:{//方向、俯视和仰角
               heading:Cesium.Math.toRadians(0),
               pitch:Cesium.Math.toRadians(-75),
@@ -53,6 +54,7 @@ onMounted(()=>{
         else if(viewer.camera.pitch>Cesium.Math.toRadians(-35)){
             console.log("差视角")
             viewer.camera.flyTo({
+              destination:Cesium.Cartesian3.fromDegrees(113.318977,23.114155,1800),
               orientation:{//方向、俯视和仰角
               heading:Cesium.Math.toRadians(0),
               pitch:Cesium.Math.toRadians(-35),
@@ -89,7 +91,7 @@ onMounted(()=>{
          id:'模型1',
          url : '../src/3Dmodel/city2-draco.gltf',
          modelMatrix : modelMatrix,
-         scale : 100,  //放大倍数
+         scale : 10,  //放大倍数
          incrementallyLoadTextures:true,
          })
     );
