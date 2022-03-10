@@ -1,6 +1,7 @@
 <template>
  <div id="cesiumContainer"> </div>
  <button v-on:click="BackToOrgin">回到初始视角</button>
+  <button v-on:click="lockView">锁死视角</button>
 </template>
 
 <script setup>
@@ -42,42 +43,42 @@ onMounted(()=>{
     window.setInterval( function(){
       var lon=viewer.camera.positionCartographic.longitude* 180 / Math.PI;
       var lan=viewer.camera.positionCartographic.latitude* 180 / Math.PI;
-      if(Cesium.Math.toRadians(-90)<viewer.camera.pitch&&viewer.camera.pitch<Cesium.Math.toRadians(0)){
+      if(Cesium.Math.toRadians(-90)<viewer.camera.pitch&&viewer.camera.pitch<Cesium.Math.toRadians(-20)){
            //console.log("好视角")
         }
         else if(Cesium.Math.toRadians(-90)>viewer.camera.pitch){
            //console.log("差视角")
            viewer.camera.setView({
-              destination:Cesium.Cartesian3.fromDegrees(lon,lan,100),
+              destination:Cesium.Cartesian3.fromDegrees(lon,lan,1000),
               orientation:{//方向、俯视和仰角
               heading:Cesium.Math.toRadians(0),
               pitch:Cesium.Math.toRadians(-89),
             }
          });
         }
-        else if(viewer.camera.pitch>Cesium.Math.toRadians(0)){
+        else if(viewer.camera.pitch>Cesium.Math.toRadians(-20)){
             //console.log("差视角");
             viewer.camera.setView({
-              destination:Cesium.Cartesian3.fromDegrees(lon,lan,100),
+              destination:Cesium.Cartesian3.fromDegrees(lon,lan,1000),
               orientation:{//方向、俯视和仰角
               heading:Cesium.Math.toRadians(0),
-              pitch:Cesium.Math.toRadians(-1),
+              pitch:Cesium.Math.toRadians(-21),
             }
          });
         }
 
         console.log(viewer.camera.position.y);
     
-    }, 1000);
+    }, 900);
 
 
 
     //设置初始化视角
    viewer.camera.setView({
-     destination:Cesium.Cartesian3.fromDegrees(113.318977,23.104155,1800),
+     destination:Cesium.Cartesian3.fromDegrees(111.695937290002,21.8428761847095,1000),
      orientation:{//方向、俯视和仰角
        heading:Cesium.Math.toRadians(0),
-       pitch:Cesium.Math.toRadians(-45),
+       pitch:Cesium.Math.toRadians(-30),
      }
  })
 
@@ -97,8 +98,7 @@ onMounted(()=>{
 
    //导入模型
     var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
-         Cesium.Cartesian3.fromDegrees(113.318977,23.114155));
-    
+         Cesium.Cartesian3.fromDegrees(113.318977,23.114155));   
     var model = scene.primitives.add(Cesium.Model.fromGltf({
          id:'模型1',
          url : '../src/3Dmodel/city2-draco.gltf',
@@ -107,6 +107,42 @@ onMounted(()=>{
          incrementallyLoadTextures:true,
          })
     );
+
+    var MatrixRoute1=Cesium.Transforms.eastNorthUpToFixedFrame(
+         Cesium.Cartesian3.fromDegrees(111.695937290002,21.8428761847095));
+    var point1 = scene.primitives.add(Cesium.Model.fromGltf({
+         id:'标记1',
+         url : '../src/3Dmodel/标注点.gltf',
+         modelMatrix : MatrixRoute1,
+         scale : 10,  //放大倍数
+         incrementallyLoadTextures:true,
+         })
+    );   
+
+    var MatrixRoute2=Cesium.Transforms.eastNorthUpToFixedFrame(
+         Cesium.Cartesian3.fromDegrees(111.694978343395,21.8427164366642));
+    var point2 = scene.primitives.add(Cesium.Model.fromGltf({
+         id:'标记2',
+         url : '../src/3Dmodel/标注点.gltf',
+         modelMatrix : MatrixRoute2,
+         scale : 10,  //放大倍数
+         incrementallyLoadTextures:true,
+         })
+    );
+
+    var MatrixRoute3=Cesium.Transforms.eastNorthUpToFixedFrame(
+         Cesium.Cartesian3.fromDegrees(111.694036062564,21.8425401000858));
+    var point2 = scene.primitives.add(Cesium.Model.fromGltf({
+         id:'标记3',
+         url : '../src/3Dmodel/标注点.gltf',
+         modelMatrix : MatrixRoute3,
+         scale : 10,  //放大倍数
+         incrementallyLoadTextures:true,
+         })
+    );
+
+
+
     
     //缩放模型，作用不大
     const scale=Cesium.Matrix4.fromScale(new Cesium.Cartesian3(0.5,0.5,0.5),new Cesium.Matrix4)
@@ -141,7 +177,7 @@ onMounted(()=>{
   //跳转到初始视角，与setView的区别在于有飞行的过程
   function BackToOrgin(){
         viewer.camera.flyTo({
-          destination:Cesium.Cartesian3.fromDegrees(113.318977,23.114155,1800),
+          destination:Cesium.Cartesian3.fromDegrees(111.695937290002,21.8428761847095,1800),
           orientation:{//方向、俯视和仰角
             heading:Cesium.Math.toRadians(0),
             pitch:Cesium.Math.toRadians(-45),
