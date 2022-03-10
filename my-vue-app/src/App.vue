@@ -95,21 +95,6 @@ onMounted(()=>{
   scene.screenSpaceCameraController.zoomEventTypes = [
      Cesium.CameraEventType.MIDDLE_DRAG, Cesium.CameraEventType.WHEEL, Cesium.CameraEventType.PINCH];
 
-  
-
-
-   //导入模型
-    var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
-         Cesium.Cartesian3.fromDegrees(113.318977,23.114155));   
-    var model = scene.primitives.add(Cesium.Model.fromGltf({
-         id:'模型1',
-         url : '../src/3Dmodel/city2-draco.gltf',
-         modelMatrix : modelMatrix,
-         scale : 10,  //放大倍数
-         incrementallyLoadTextures:true,
-         })
-    );
-
     var MatrixRoute1=Cesium.Transforms.eastNorthUpToFixedFrame(
          Cesium.Cartesian3.fromDegrees(111.695937290002,21.8428761847095));
     var point1 = scene.primitives.add(Cesium.Model.fromGltf({
@@ -136,17 +121,6 @@ onMounted(()=>{
          Cesium.Cartesian3.fromDegrees(111.694036062564,21.8425401000858));
     var point3 = scene.primitives.add(Cesium.Model.fromGltf({
          id:'标记3',
-         url : '../src/3Dmodel/标注点.gltf',
-         modelMatrix : MatrixRoute3,
-         scale : 10,  //放大倍数
-         incrementallyLoadTextures:true,
-         })
-    );
-
-    var MatrixRoute4=Cesium.Transforms.eastNorthUpToFixedFrame(
-         Cesium.Cartesian3.fromDegrees(112.694036062564,21.8425401000858));
-    var point4 = scene.primitives.add(Cesium.Model.fromGltf({
-         id:'标记4',
          url : '../src/3Dmodel/标注点.gltf',
          modelMatrix : MatrixRoute3,
          scale : 10,  //放大倍数
