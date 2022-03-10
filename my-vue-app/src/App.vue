@@ -1,6 +1,7 @@
 <template>
  <div id="cesiumContainer"> </div>
  <button v-on:click="BackToOrgin">回到初始视角</button>
+ <div>
   <button v-on:click="lockView">锁死视角</button>
 </template>
 
@@ -35,6 +36,7 @@ onMounted(()=>{
   scene.debugShowFramesPerSecond = true;//显示帧数
   scene.screenSpaceCameraController.enableCollisionDetection = false;// 是否允许相机进入地下
   scene.mode = Cesium.SceneMode.COLUMBUS_VIEW;//默认2.5D
+  
 
   
 
