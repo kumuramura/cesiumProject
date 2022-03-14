@@ -147,7 +147,7 @@ export default {
         }
         //选中某模型   pick选中的对象
         if (Cesium.defined(pick)) {
-          console.log("点到了！");
+          console.log("点到了"+pick.id);
         }
       }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 
@@ -210,7 +210,7 @@ export default {
         }
 
         console.log(viewer.camera.position.y);
-      }, 900);
+      }, 800);
     }
     //每秒检测一下视角对不对，此处问题非常多，建议锁定上下视角
 
