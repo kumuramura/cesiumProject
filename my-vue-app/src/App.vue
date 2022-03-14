@@ -114,9 +114,22 @@ export default {
       var MatrixRoute3 = Cesium.Transforms.eastNorthUpToFixedFrame(
         Cesium.Cartesian3.fromDegrees(111.694036062564, 21.8425401000858)
       );
-      var point2 = scene.primitives.add(
+      var point3 = scene.primitives.add(
         Cesium.Model.fromGltf({
           id: "标记3",
+          url: "../src/3Dmodel/标注点.gltf",
+          modelMatrix: MatrixRoute3,
+          scale: 10, //放大倍数
+          incrementallyLoadTextures: true,
+        })
+      );
+
+      var MatrixRoute4 = Cesium.Transforms.eastNorthUpToFixedFrame(
+        Cesium.Cartesian3.fromDegrees(111.693091601014, 21.8423708733865)
+      );
+      var point4 = scene.primitives.add(
+        Cesium.Model.fromGltf({
+          id: "标记4",
           url: "../src/3Dmodel/标注点.gltf",
           modelMatrix: MatrixRoute3,
           scale: 10, //放大倍数
