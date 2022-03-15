@@ -11,13 +11,19 @@ export default {
   setup() {
     let viewer;
     onMounted(() => {
-      var custom = new Cesium.ArcGisMapServerImageryProvider({
+      var arcMap = new Cesium.ArcGisMapServerImageryProvider({
         url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
+      });
+      var gaodeMap=new Cesium.UrlTemplateImageryProvider({
+        url: "https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}"
+      });
+      var tianMap=new Cesium.UrlTemplateImageryProvider({
+        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=49190982fae336528563aaf761b39e67"
       });
       viewer = new Cesium.Viewer("cesiumContainer", {
         //viewer初始化设置
         baseLayerPicker: false,
-        imageryProvider: custom,
+        imageryProvider: arcMap,
         timeline: false,
         navigationHelpButton: false,
         navigationInstructionsInitiallyVisible: false,
@@ -71,20 +77,6 @@ export default {
         Cesium.CameraEventType.PINCH,
       ];
 
-      //导入模型
-      var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
-        Cesium.Cartesian3.fromDegrees(113.318977, 23.114155)
-      );
-      var model = scene.primitives.add(
-        Cesium.Model.fromGltf({
-          id: "模型1",
-          url: "../src/3Dmodel/city2-draco.gltf",
-          modelMatrix: modelMatrix,
-          scale: 10, //放大倍数
-          incrementallyLoadTextures: true,
-        })
-      );
-
       var MatrixRoute1 = Cesium.Transforms.eastNorthUpToFixedFrame(
         Cesium.Cartesian3.fromDegrees(111.695937290002, 21.8428761847095)
       );
@@ -131,7 +123,7 @@ export default {
         Cesium.Model.fromGltf({
           id: "标记4",
           url: "../src/3Dmodel/标注点.gltf",
-          modelMatrix: MatrixRoute3,
+          modelMatrix: MatrixRoute4,
           scale: 10, //放大倍数
           incrementallyLoadTextures: true,
         })
