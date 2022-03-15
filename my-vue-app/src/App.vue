@@ -37,7 +37,8 @@ export default {
         //imageryProvider:
       });
       var scene = viewer.scene;
-      viewer.scene.screenSpaceCameraController.enableZoom = false;
+      scene.screenSpaceCameraController.enableZoom = false;//禁止缩放
+      scene.screenSpaceCameraController.enableTilt = false;//禁止倾斜
       viewer.cesiumWidget.creditContainer.style.display = "none"; //移除版权信息
       scene.skyAtmosphere.show = false; // 关闭大气层
       scene.debugShowFramesPerSecond = true; //显示帧数
@@ -47,13 +48,13 @@ export default {
       //设置初始化视角
       viewer.camera.setView({
         destination: Cesium.Cartesian3.fromDegrees(
-          111.695937290002,
-          21.8428761847095,
+          111.68292393061465,
+          21.840709070727815,
           1000
         ),
         orientation: {
           //方向、俯视和仰角
-          heading: Cesium.Math.toRadians(0),
+          heading: Cesium.Math.toRadians(80),
           pitch: Cesium.Math.toRadians(-30),
         },
       });
@@ -129,16 +130,7 @@ export default {
         })
       );
 
-      //缩放模型，作用不大
-      const scale = Cesium.Matrix4.fromScale(
-        new Cesium.Cartesian3(0.5, 0.5, 0.5),
-        new Cesium.Matrix4()
-      );
-      model.modelMatrix = Cesium.Matrix4.multiply(
-        model.modelMatrix,
-        scale,
-        model.modelMatrix
-      );
+     
 
       //点击检测
       var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
@@ -170,19 +162,19 @@ export default {
       console.log("跳转到初始视角");
       viewer.camera.flyTo({
         destination: Cesium.Cartesian3.fromDegrees(
-          111.695937290002,
-          21.8428761847095,
-          1800
+          111.68292393061465,
+          21.840709070727815,
+          1000
         ),
         orientation: {
           //方向、俯视和仰角
-          heading: Cesium.Math.toRadians(0),
-          pitch: Cesium.Math.toRadians(-45),
+          heading: Cesium.Math.toRadians(80),
+          pitch: Cesium.Math.toRadians(-30),
         },
-        duration: 5,
+        duration: 0.4,
       });
     }
-    function lockView() {
+    function lockView() {//锁死视角，现在没用了
       window.setInterval(function () {
         var lon =
           (viewer.camera.positionCartographic.longitude * 180) / Math.PI;
@@ -214,7 +206,7 @@ export default {
           });
         }
 
-        console.log(viewer.camera.position.y);
+        console.log("经度"+lon+", 纬度"+lan);
       }, 800);
     }
     //每秒检测一下视角对不对，此处问题非常多，建议锁定上下视角
