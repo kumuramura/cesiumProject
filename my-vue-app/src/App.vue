@@ -3,6 +3,7 @@
   <button v-on:click="backToOrgin">回到初始视角</button>
   <button v-on:click="lockView">锁死视角</button>
   <button v-on:click="rotateLeft">左旋</button>
+  <button v-on:click="NewRotateLeft">新左旋</button> 
 </template>
 
 <script>
@@ -11,6 +12,7 @@ import { onMounted } from "@vue/runtime-core";
 export default {
   setup() {
     let viewer;
+    var po=0;
     onMounted(() => {
       var arcMap = new Cesium.ArcGisMapServerImageryProvider({
         url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
@@ -38,8 +40,9 @@ export default {
         //imageryProvider:
       });
       var scene = viewer.scene;
-      // scene.screenSpaceCameraController.enableZoom = false; //禁止缩放
-      // scene.screenSpaceCameraController.enableTilt = false; //禁止倾斜
+      scene.screenSpaceCameraController.enableZoom = false; //禁止缩放
+      scene.screenSpaceCameraController.enableTilt = false; //禁止倾斜
+      scene.screenSpaceCameraController.enableTranslate = false; //禁止移动
       viewer.cesiumWidget.creditContainer.style.display = "none"; //移除版权信息
       scene.skyAtmosphere.show = false; // 关闭大气层
       scene.debugShowFramesPerSecond = true; //显示帧数
@@ -59,6 +62,7 @@ export default {
           pitch: Cesium.Math.toRadians(-30),
         },
       });
+      
 
       //改为右键
       scene.screenSpaceCameraController.tiltEventTypes = [
@@ -91,6 +95,7 @@ export default {
           incrementallyLoadTextures: true,
         })
       );
+      
 
       var MatrixRoute2 = Cesium.Transforms.eastNorthUpToFixedFrame(
         Cesium.Cartesian3.fromDegrees(111.694978343395, 21.8427164366642)
@@ -143,18 +148,11 @@ export default {
         }
         //选中某模型   pick选中的对象
         if (Cesium.defined(pick)) {
-          console.log("点到了" + pick.id);
+          console.log("点到了" + pick.id+"，位置为");
         }
       }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 
-      //不用
-      function mode3D_play(checkbox) {
-        if (checkbox.checked == true) {
-          model.show = true;
-        } else {
-          model.show = false;
-        }
-      }
+    
     });
     //跳转到初始视角，与setView的区别在于有飞行的过程
     function backToOrgin() {
@@ -208,8 +206,11 @@ export default {
 
         console.log("经度" + lon + ", 纬度" + lan);
       }, 800);
+
+       
     }
-    //每秒检测一下视角对不对，此处问题非常多，建议锁定上下视角
+
+
     function normalized3D(x, y, z) {
       const new_x = x / Math.sqrt(x * x + y * y + z * z);
       const new_y = y / Math.sqrt(x * x + y * y + z * z);
@@ -221,6 +222,7 @@ export default {
         z: new_z,
       };
     }
+
     function rotateLeft() {
       const point = { lon: 111.695937290002, lat: 21.8428761847095 }; // 桩点
       const lon =
@@ -228,17 +230,9 @@ export default {
       const lat = (viewer.camera.positionCartographic.latitude * 180) / Math.PI;
       const rotate = 30;
       const newHeading =
-        viewer.camera.heading + Cesium.Math.toRadians(rotate * 2.705);
-      const newPoint = {
-        lon:
-          Math.cos(rotate) * (lon - point.lon) -
-          Math.sin(rotate) * (lat - point.lat) +
-          point.lon,
-        lat:
-          Math.cos(rotate) * (lat - point.lat) +
-          Math.sin(rotate) * (lon - point.lon) +
-          point.lat,
-      };
+        viewer.camera.heading + Cesium.Math.toRadians(rotate* 2.705);
+      
+
       const x1 = Cesium.Cartesian3.fromDegrees(point.lon, point.lat, 0).x,
         y1 = Cesium.Cartesian3.fromDegrees(point.lon, point.lat, 0).y,
         z1 = Cesium.Cartesian3.fromDegrees(point.lon, point.lat, 0).z,
@@ -263,14 +257,8 @@ export default {
         (y * z * (1 - c) + x * s) * old_y +
         (z * z * (1 - c) + c) * old_z;
       console.log(Cesium.Cartesian3.fromDegrees(point.lon, point.lat, 0));
-      console.log(new_x, new_y, new_z);
       console.log(new Cesium.Cartesian3(new_x, new_y, new_z));
-      viewer.camera.setView({
-        // destination: Cesium.Cartesian3.fromDegrees(
-        //   newPoint.lon,
-        //   newPoint.lat,
-        //   1000
-        // ),
+      viewer.camera.flyTo({
         destination: new Cesium.Cartesian3(new_x, new_y, new_z),
         orientation: {
           //方向、俯视和仰角
@@ -279,10 +267,142 @@ export default {
         },
       });
     }
+
+    function NewRotateLeft() {
+
+      //歪办法，希望能改进……
+      var originPoint={lon:111.68292393061465 ,lat:21.840709070727815};//初始点
+      var point1 ={ lon: 111.695937290002, lat: 21.8428761847095 }; // 桩点
+      var point2 ={ lon: 111.694978343395, lat: 21.8427164366642 }; // 桩点
+
+      console.log("相机默认位置为"+viewer.camera.position);
+
+      //遍历
+      viewer.camera.setView({
+        destination: Cesium.Cartesian3.fromDegrees(
+          point1.lon,
+          point1.lat,
+          1000
+        ),
+      });
+
+      var point1Pos=viewer.camera.position;
+      console.log("桩点1位置为"+viewer.camera.position);
+
+      viewer.camera.setView({
+        destination: Cesium.Cartesian3.fromDegrees(
+          point2.lon,
+          point2.lat,
+          1000
+        ),
+      });
+
+      var point2Pos=viewer.camera.position;
+      console.log("桩点2位置为"+viewer.camera.position);
+
+      //结束遍历，相机回到原地
+      viewer.camera.setView({
+        destination: Cesium.Cartesian3.fromDegrees(
+          originPoint.lon,
+          originPoint.lat,
+          2000
+        ),
+        orientation: {
+          //方向、俯视和仰角
+          heading: Cesium.Math.toRadians(80),
+          pitch: Cesium.Math.toRadians(-90),
+        },
+      });
+      //开始获取旋转的坐标,此处以point1为例
+        const newPoint1 = {
+        x:
+            Math.cos(90) * (viewer.camera.position.x - point1Pos.x) -
+            Math.sin(90) * (viewer.camera.position.y - point1Pos.y) +
+            point1Pos.x,
+        y:
+             Math.cos(90) * (viewer.camera.position.y - point1Pos.y) +
+             Math.sin(90) * (viewer.camera.position.x - point1Pos.x) +
+            point1Pos.y,
+      };
+      const newPoint2 = {
+        x:
+            Math.cos(180) * (viewer.camera.position.x - point1Pos.x) -
+            Math.sin(180) * (viewer.camera.position.y - point1Pos.y) +
+            point1Pos.x,
+        y:
+             Math.cos(180) * (viewer.camera.position.y - point1Pos.y) +
+             Math.sin(180) * (viewer.camera.position.x - point1Pos.x) +
+            point1Pos.y,
+      };
+      const newPoint3 = {
+        x:
+            Math.cos(-90) * (viewer.camera.position.x - point1Pos.x) -
+            Math.sin(-90) * (viewer.camera.position.y - point1Pos.y) +
+            point1Pos.x,
+        y:
+             Math.cos(-90) * (viewer.camera.position.y - point1Pos.y) +
+             Math.sin(-90) * (viewer.camera.position.x - point1Pos.x) +
+            point1Pos.y,
+      };
+      const newPoint0 = {
+        x:
+            viewer.camera.position.x ,
+        y:
+            viewer.camera.position.y ,
+      };
+      console.log("newPoint1是"+newPoint1.x+" "+newPoint1.y);
+      //旋转交互
+      po=po+1;
+      if(po%4==1){
+        viewer.camera.setView({
+        orientation: {
+          //方向、俯视和仰角
+          heading: Cesium.Math.toRadians(170),
+          pitch: Cesium.Math.toRadians(-90),
+        },
+      });
+        viewer.camera.position=Cesium.Cartesian3(newPoint1.x,newPoint1.y,2000);
+  
+      }else if(po%4==2){
+        viewer.camera.setView({
+        orientation: {
+          //方向、俯视和仰角
+          heading: Cesium.Math.toRadians(260),
+          pitch: Cesium.Math.toRadians(-90),
+        },
+      });
+      viewer.camera.position=Cesium.Cartesian3(newPoint2.x,newPoint2.y,2000);
+      }else if(po%4==3){
+        viewer.camera.setView({
+        orientation: {
+          //方向、俯视和仰角
+          heading: Cesium.Math.toRadians(350),
+          pitch: Cesium.Math.toRadians(-90),
+        },
+      });
+      viewer.camera.position=Cesium.Cartesian3(newPoint3.x,newPoint3.y,2000);
+      }else if(po%4==0){
+        viewer.camera.setView({
+        orientation: {
+          //方向、俯视和仰角
+          heading: Cesium.Math.toRadians(80),
+          pitch: Cesium.Math.toRadians(-90),
+        },
+      });
+      viewer.camera.position=Cesium.Cartesian3(newPoint0.x,newPoint0.y,2000);
+      }
+
+
+      
+     
+    }
+
+
     return {
       backToOrgin,
       lockView,
       rotateLeft,
+      NewRotateLeft,
     };
   },
 };
