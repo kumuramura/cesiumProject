@@ -2,6 +2,7 @@
   <div id="cesiumContainer"></div>
   <button v-on:click="backToOrgin">回到初始视角</button>
   <button v-on:click="lockView">锁死视角</button>
+  <button v-on:click="rotateLeft">左旋</button>
 </template>
 
 <script>
@@ -14,11 +15,11 @@ export default {
       var arcMap = new Cesium.ArcGisMapServerImageryProvider({
         url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
       });
-      var gaodeMap=new Cesium.UrlTemplateImageryProvider({
-        url: "https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}"
+      var gaodeMap = new Cesium.UrlTemplateImageryProvider({
+        url: "https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}",
       });
-      var tianMap=new Cesium.UrlTemplateImageryProvider({
-        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=49190982fae336528563aaf761b39e67"
+      var tianMap = new Cesium.UrlTemplateImageryProvider({
+        url: "https://t5.tianditu.gov.cn/DataServer?T=img_w&x={x}&y={y}&l={z}&tk=49190982fae336528563aaf761b39e67",
       });
       viewer = new Cesium.Viewer("cesiumContainer", {
         //viewer初始化设置
@@ -37,8 +38,8 @@ export default {
         //imageryProvider:
       });
       var scene = viewer.scene;
-      scene.screenSpaceCameraController.enableZoom = false;//禁止缩放
-      scene.screenSpaceCameraController.enableTilt = false;//禁止倾斜
+      // scene.screenSpaceCameraController.enableZoom = false; //禁止缩放
+      // scene.screenSpaceCameraController.enableTilt = false; //禁止倾斜
       viewer.cesiumWidget.creditContainer.style.display = "none"; //移除版权信息
       scene.skyAtmosphere.show = false; // 关闭大气层
       scene.debugShowFramesPerSecond = true; //显示帧数
@@ -130,8 +131,6 @@ export default {
         })
       );
 
-     
-
       //点击检测
       var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
       handler.setInputAction(function (click) {
@@ -144,7 +143,7 @@ export default {
         }
         //选中某模型   pick选中的对象
         if (Cesium.defined(pick)) {
-          console.log("点到了"+pick.id);
+          console.log("点到了" + pick.id);
         }
       }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 
@@ -174,7 +173,8 @@ export default {
         duration: 0.4,
       });
     }
-    function lockView() {//锁死视角，现在没用了
+    function lockView() {
+      //锁死视角，现在没用了
       window.setInterval(function () {
         var lon =
           (viewer.camera.positionCartographic.longitude * 180) / Math.PI;
@@ -206,14 +206,83 @@ export default {
           });
         }
 
-        console.log("经度"+lon+", 纬度"+lan);
+        console.log("经度" + lon + ", 纬度" + lan);
       }, 800);
     }
     //每秒检测一下视角对不对，此处问题非常多，建议锁定上下视角
+    function normalized3D(x, y, z) {
+      const new_x = x / Math.sqrt(x * x + y * y + z * z);
+      const new_y = y / Math.sqrt(x * x + y * y + z * z);
+      const new_z = z / Math.sqrt(x * x + y * y + z * z);
+      console.log(new_x, new_y, new_z);
+      return {
+        x: new_x,
+        y: new_y,
+        z: new_z,
+      };
+    }
+    function rotateLeft() {
+      const point = { lon: 111.695937290002, lat: 21.8428761847095 }; // 桩点
+      const lon =
+        (viewer.camera.positionCartographic.longitude * 180) / Math.PI;
+      const lat = (viewer.camera.positionCartographic.latitude * 180) / Math.PI;
+      const rotate = 30;
+      const newHeading =
+        viewer.camera.heading + Cesium.Math.toRadians(rotate * 2.705);
+      const newPoint = {
+        lon:
+          Math.cos(rotate) * (lon - point.lon) -
+          Math.sin(rotate) * (lat - point.lat) +
+          point.lon,
+        lat:
+          Math.cos(rotate) * (lat - point.lat) +
+          Math.sin(rotate) * (lon - point.lon) +
+          point.lat,
+      };
+      const x1 = Cesium.Cartesian3.fromDegrees(point.lon, point.lat, 0).x,
+        y1 = Cesium.Cartesian3.fromDegrees(point.lon, point.lat, 0).y,
+        z1 = Cesium.Cartesian3.fromDegrees(point.lon, point.lat, 0).z,
+        old_x = Cesium.Cartesian3.fromDegrees(lon, lat, 1000).x,
+        old_y = Cesium.Cartesian3.fromDegrees(lon, lat, 1000).y,
+        old_z = Cesium.Cartesian3.fromDegrees(lon, lat, 1000).z;
+      const { x, y, z } = normalized3D(x1, y1, z1);
+      const c = Math.cos(rotate);
+      const s = Math.sin(rotate);
+      const new_x =
+        (x * x * (1 - c) + c) * old_x +
+        (x * y * (1 - c) - z * s) * old_y +
+        (x * z * (1 - c) + y * s) * old_z;
 
+      const new_y =
+        (y * x * (1 - c) + z * s) * old_x +
+        (y * y * (1 - c) + c) * old_y +
+        (y * z * (1 - c) - x * s) * old_z;
+
+      const new_z =
+        (x * z * (1 - c) - y * s) * old_x +
+        (y * z * (1 - c) + x * s) * old_y +
+        (z * z * (1 - c) + c) * old_z;
+      console.log(Cesium.Cartesian3.fromDegrees(point.lon, point.lat, 0));
+      console.log(new_x, new_y, new_z);
+      console.log(new Cesium.Cartesian3(new_x, new_y, new_z));
+      viewer.camera.setView({
+        // destination: Cesium.Cartesian3.fromDegrees(
+        //   newPoint.lon,
+        //   newPoint.lat,
+        //   1000
+        // ),
+        destination: new Cesium.Cartesian3(new_x, new_y, new_z),
+        orientation: {
+          //方向、俯视和仰角
+          heading: newHeading,
+          pitch: viewer.camera.pitch,
+        },
+      });
+    }
     return {
       backToOrgin,
       lockView,
+      rotateLeft,
     };
   },
 };
